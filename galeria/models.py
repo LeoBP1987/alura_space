@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import datetime
 
 class Fotografia(models.Model):
 
@@ -14,6 +15,8 @@ class Fotografia(models.Model):
     categoria = models.CharField(max_length=100, choices = categorias, default = '')
     descricao = models.TextField(null=False, blank=False)
     foto = models.CharField(max_length=100, null=False, blank=False)
+    publicado = models.BooleanField(default='False')
+    data_fotografia = models.DateTimeField(default = datetime.now, blank='')
 
     def __str__(self):
         return f'Fotografia {self.nome}'
