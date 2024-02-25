@@ -17,6 +17,7 @@ class Fotografia(models.Model):
     foto = models.ImageField(upload_to='foto/%Y/%m/%d/', blank='True', null='True')
     publicado = models.BooleanField(default='False')
     data_fotografia = models.DateTimeField(default = datetime.now, blank='')
+    clique = models.IntegerField(default=0)
 
     def __str__(self):
         return self.nome
