@@ -8,5 +8,5 @@ urlpatterns = [
     path('buscar_tag/', buscar_tag, name='buscar_tag'),
     path('supreender/', surpreender, name='surpreender'),
     path('novas/', novas, name='novas'),
-    path('mais_vistas/', mais_vistas, name='mais_vistas')
+    path('mais_vistas/', mais_vistas, name='mais_vistas'),
 ]
