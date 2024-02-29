@@ -11,9 +11,9 @@ class Fotografia(models.Model):
         ('PLANETA', 'Planeta')
     ]
 
-    nome = models.CharField(max_length=100, null=False, blank=False)
-    legenda = models.CharField(max_length=150, null=False, blank=False)
-    categoria = models.CharField(max_length=100, choices = categorias, default = '')
+    nome = models.CharField(max_length=70, null=False, blank=False)
+    legenda = models.CharField(max_length=80, null=False, blank=False)
+    categoria = models.CharField(max_length=50, choices = categorias, default = '')
     descricao = models.TextField(null=False, blank=False)
     foto = models.ImageField(upload_to='foto/%Y/%m/%d/', blank='True', null='True')
     publicado = models.BooleanField(default='False')

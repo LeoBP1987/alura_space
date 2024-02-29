@@ -1,6 +1,8 @@
-{% extends 'usuarios/partials/_menulateral_usuarios.html' %}
+{% extends 'shared/base.html' %}
 {% load static %}
 {% block content %}
+{% include 'usuarios/partials/_menulateral.html' %}
+<section class="galeria" style="margin-left: 0em">
 <form action="{% url 'cadastrar' %}" method="POST">
     {% csrf_token %}
     <div class="row">
@@ -20,4 +22,5 @@
     </div>
     </div>
 </form>
+</section>
 {% endblock %}

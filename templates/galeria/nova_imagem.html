@@ -1,9 +1,9 @@
 {% extends 'shared/base.html' %}
 {% load static %}
 {% block content %}
-{% include 'usuarios/partials/_menulateral.html' %}
-<section class="galeria" style="margin-left: 0em">
-<form action="{% url 'login' %}" method="POST">
+{% include 'galeria/partials/_menulateral.html' %}
+<section class="galeria" style="margin-left: 5em">
+<form action="{% url 'nova_imagem' %}" method="POST">
     {% csrf_token %}
     <div class="row">
     {% for field in form.visible_fields %}
