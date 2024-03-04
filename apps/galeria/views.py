@@ -4,6 +4,7 @@ from apps.galeria.forms import FotografiaForms
 from django.contrib import messages
 from django.db.models import Max
 import random
+import os
 
 def index(request):
     if not request.user.is_authenticated:
@@ -17,7 +18,9 @@ def imagem(request, foto_id):
     fotografia = get_object_or_404(Fotografia, pk=foto_id)
     fotografia.clique += 1
     fotografia.save()
-    return render(request, 'galeria/imagem.html', {'fotografia' : fotografia})
+    foto_usuario = str(fotografia.usuario)
+    usuario = request.user.username
+    return render(request, 'galeria/imagem.html', {'fotografia' : fotografia, 'usuario' : usuario, 'foto_usuario':foto_usuario})
 
 def buscar(request):
     if not request.user.is_authenticated:
@@ -45,11 +48,17 @@ def buscar_tag(request):
 def surpreender(request):
     fotografias = Fotografia.objects.order_by('data_fotografia').filter(publicado=True)
 
+    if not fotografias:
+        messages.error(request, 'Não há fotografias cadastradas no momento')
+        return redirect('index')
+
     numero_sorteado = random.randint(1, len(fotografias))
 
     fotografia = get_object_or_404(Fotografia, pk=numero_sorteado)
+    foto_usuario = str(fotografia.usuario)
+    usuario = request.user.username
 
-    return render(request, 'galeria/surpreender.html', {'fotografia':fotografia})
+    return render(request, 'galeria/surpreender.html', {'fotografia':fotografia, 'usuario':usuario, 'foto_usuario':foto_usuario})
 
 def novas(request):
     fotografias = Fotografia.objects.order_by("-data_fotografia").filter(publicado=True)[:4]
@@ -59,36 +68,44 @@ def mais_vistas(request):
     fotografias = Fotografia.objects.order_by('-clique').filter(publicado=True)[:4]
     return render(request, 'galeria/mais_vistas.html', {'cards':fotografias})
 
+def minhas_imagens(request):
+    usuario_logado = request.user.id
+    fotografias = Fotografia.objects.order_by('data_fotografia').filter(publicado=True, usuario=usuario_logado)
+
+    if not fotografias:
+        messages.error(request, f'{request.user.username} não tem fotográfias no momento')
+        return redirect('index')
+
+    return render(request, 'galeria/minhas_imagens.html', {'cards':fotografias})
+
 def nova_imagem(request):
     form = FotografiaForms()
 
     if request.method == 'POST':
-        form = FotografiaForms(request.POST)
-
+        form = FotografiaForms(request.POST, request.FILES)
         if form.is_valid():
-            maior_id = Fotografia.objects.aggregate(maior_id=Max('id'))['maior_id']
-            id = maior_id + 1
-            nome = form['nome'].value()
-            legenda = form['legenda'].value()
-            categoria = form['categoria'].value()
-            descricao = form['descricao'].value()
-            foto = form['foto'].value()
-            publicado = True
-            data = form['data_fotografia'].value()
-            usuario = form['usuario'].value()
-
-            foto = Fotografia(id, nome, legenda, categoria, descricao, foto, publicado, data, usuario)
-
-            foto.save()
-
+            form.save()
             messages.success(request, 'Fotografia salva com sucesso')
             return redirect('index')
 
     return render(request, 'galeria/nova_imagem.html', {'form':form})
 
-def editar_imagem(request):
-    pass
+def editar_imagem(request, foto_id):
+    fotografia = Fotografia.objects.get(id=foto_id)
+    form = FotografiaForms(instance=fotografia)
 
-def deletar_imagem(request):
-    pass
+    if request.method == 'POST':
+        form = FotografiaForms(request.POST, request.FILES, instance=fotografia)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Fotogradia Editada com Sucesso')
+            return redirect('index')
+
+    return render(request, 'galeria/editar_imagem.html', {'form':form, 'foto_id':foto_id})
+    
+def deletar_imagem(request, foto_id):
+    fotografia = Fotografia.objects.get(id=foto_id)
+    fotografia.delete()
+    messages.success(request, 'Fotografia Apagada com sucesso')
+    return redirect('index')
 

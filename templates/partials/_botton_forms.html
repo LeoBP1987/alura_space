@@ -1,0 +1,13 @@
+{% load static %}
+<div style="display: flex; justify-content: space-between; ">
+    <button class="btn btn-success col-12" style="padding: top 5px; margin-left: 5px;" type="submit">Cadastrar</button>
+    <button class="btn btn-danger col-12" style="padding: top 5px; margin-left: 5px;" type="button" onclick="cancelarCadastro()">Cancelar</button>
+</div>
+</div>
+</form>
+</section>
+<script>
+function cancelarCadastro() {
+    window.location.href = "{% url 'index' %}";
+}
+</script>

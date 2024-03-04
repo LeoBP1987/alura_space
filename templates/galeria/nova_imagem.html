@@ -3,7 +3,7 @@
 {% block content %}
 {% include 'galeria/partials/_menulateral.html' %}
 <section class="galeria" style="margin-left: 5em">
-<form action="{% url 'nova_imagem' %}" method="POST">
+<form action="{% url 'nova_imagem' %}" method="POST" enctype="multipart/form-data">
     {% csrf_token %}
     <div class="row">
     {% for field in form.visible_fields %}
@@ -17,10 +17,6 @@
         </div>
         {% endfor %}                        
     {% endfor %}
-    <div>
-        <button class="btn btn-success col-12" style="padding: top 5px;" type="submit">Logar</button>
-    </div>
-    </div>
-</form>
-</section>
+    {% include 'partials/_botton_forms.html' %}
+
 {% endblock %}
