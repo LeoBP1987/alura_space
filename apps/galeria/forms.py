@@ -1,10 +1,11 @@
 from django import forms
 from apps.galeria.models import Fotografia
+from django.contrib.auth.models import User
 
 class FotografiaForms(forms.ModelForm):
     class Meta():
         model = Fotografia
-        exclude = ['publicado', 'clique']
+        exclude = ['publicado', 'clique', 'usuario']
         label = {
             'descricao':'Descrição',
             'data_fotografia': 'Data do registro',
@@ -27,6 +28,19 @@ class FotografiaForms(forms.ModelForm):
                 'style': 'width: 200px;'
 
             }),
-            'usuario': forms.Select(attrs={'class': 'form-control', 'style': 'width: 200px;'}),
+            #'usuario': forms.Select(attrs={'class': 'form-control', 'style': 'width: 200px;'}),
         }
 
+class PorUsuarioForms(forms.ModelForm):
+    class Meta():
+        model = Fotografia
+        exclude = ['nome', 'legenda', 'categoria', 'descricao', 'publicado', 'foto', 'data_fotografia', 'clique']
+        label = {
+            'usuario':'Usuario'
+        }
+
+        widgets = {
+            'usuario': forms.Select(attrs={'class': 'form-control', 'style': 'width: 200px;'}),
+        }
+   
+    

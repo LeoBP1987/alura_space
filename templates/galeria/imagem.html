@@ -15,7 +15,10 @@
                                 <p class="imagem__titulo">{{fotografia.nome}}</p>
                                 <p class="imagem__descricao">{{fotografia.legenda}}</p>
                                 <p class="imagem__texto">{{fotografia.descricao}}</p>
+                                <p class="imagem__texto"></p>
+                                <p class="imagem__descricao">postado por: {{fotografia.usuario}}</p>
                             </div>
+                         
                             <div>
                                 {% if usuario == foto_usuario %}
                                 <a href="{% url 'editar_imagem' fotografia.id %}"><button class="btn btn-success col-12" style="padding: top 5px; margin-bottom: 5px;" type="submit">Editar</button></a>

@@ -1,6 +1,7 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from apps.galeria.models import Fotografia
-from apps.galeria.forms import FotografiaForms
+from apps.galeria.forms import FotografiaForms, PorUsuarioForms
+from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db.models import Max
 import random
@@ -51,8 +52,14 @@ def surpreender(request):
     if not fotografias:
         messages.error(request, 'Não há fotografias cadastradas no momento')
         return redirect('index')
+    
+    foto_id_max = Fotografia.objects.order_by('-id')[0]
+    id_max = int(foto_id_max.id)
 
-    numero_sorteado = random.randint(1, len(fotografias))
+    numero_sorteado = random.randint(0, id_max)
+
+    while not Fotografia.objects.filter(id=numero_sorteado):
+         numero_sorteado = random.randint(0, id_max)
 
     fotografia = get_object_or_404(Fotografia, pk=numero_sorteado)
     foto_usuario = str(fotografia.usuario)
@@ -78,13 +85,27 @@ def minhas_imagens(request):
 
     return render(request, 'galeria/minhas_imagens.html', {'cards':fotografias})
 
+def por_usuario(request):
+    form = PorUsuarioForms()
+    
+    if request.method == 'POST':
+        form = PorUsuarioForms(request.POST)
+        if form.is_valid():
+            nome = form['usuario'].value()
+            fotografia = Fotografia.objects.order_by('data_fotografia').filter(publicado=True, usuario=nome)
+            return render(request, 'galeria/index.html', {'cards':fotografia})
+
+    return render(request, 'galeria/por_usuario.html', {'form':form})
+
 def nova_imagem(request):
     form = FotografiaForms()
 
     if request.method == 'POST':
         form = FotografiaForms(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
+            fotografia = form.save(commit=False)
+            fotografia.usuario = User.objects.get(username=request.user.username)
+            fotografia.save()
             messages.success(request, 'Fotografia salva com sucesso')
             return redirect('index')
 
