@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 class FotografiaForms(forms.ModelForm):
     class Meta():
         model = Fotografia
-        exclude = ['publicado', 'clique', 'usuario']
+        exclude = ['publicado', 'clique', 'usuario', 'data_fotografia']
         label = {
             'descricao':'Descrição',
             'data_fotografia': 'Data do registro',
@@ -18,17 +18,18 @@ class FotografiaForms(forms.ModelForm):
             'categoria': forms.Select(attrs={'class':'form-control', 'style': 'width: 200px;'}),
             'descricao': forms.Textarea(attrs={'class':'form-control', 'style': 'width: 850px;'}),
             'foto': forms.FileInput(attrs={'class':'form-control', 'style': 'width: 500px;'}),
-            'data_fotografia': forms.DateInput(
+            #a data da postagem esta agora carregando a proprio data do dia mantive o código para mérito de consulta
+            #'data_fotografia': forms.DateInput(
 
-                format = '%d/%m/%Y',
+             #   format = '%d/%m/%Y',
                 
-                attrs={
-                'type': 'date',
-                'class': 'form-control',
-                'style': 'width: 200px;'
+              #  attrs={
+              # 'type': 'date',
+              #  'class': 'form-control',
+              #  'style': 'width: 200px;'
 
-            }),
-            #'usuario': forms.Select(attrs={'class': 'form-control', 'style': 'width: 200px;'}),
+            #}),
+            
         }
 
 class PorUsuarioForms(forms.ModelForm):

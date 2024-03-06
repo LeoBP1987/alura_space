@@ -4,6 +4,7 @@ from apps.galeria.forms import FotografiaForms, PorUsuarioForms
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.db.models import Max
+from datetime import datetime
 import random
 import os
 
@@ -105,6 +106,7 @@ def nova_imagem(request):
         if form.is_valid():
             fotografia = form.save(commit=False)
             fotografia.usuario = User.objects.get(username=request.user.username)
+            fotografia.data_fotografia = datetime.now()
             fotografia.save()
             messages.success(request, 'Fotografia salva com sucesso')
             return redirect('index')
