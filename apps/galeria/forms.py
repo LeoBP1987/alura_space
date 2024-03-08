@@ -35,7 +35,7 @@ class FotografiaForms(forms.ModelForm):
 class PorUsuarioForms(forms.ModelForm):
     class Meta():
         model = Fotografia
-        exclude = ['nome', 'legenda', 'categoria', 'descricao', 'publicado', 'foto', 'data_fotografia', 'clique']
+        exclude = ['nome', 'legenda', 'categoria', 'descricao', 'publicado', 'foto', 'data_fotografia', 'clique', 'likes']
         label = {
             'usuario':'Usuario'
         }

@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from apps.galeria.models import Fotografia
+from apps.galeria.models import Fotografia, Likes
 from apps.galeria.forms import FotografiaForms, PorUsuarioForms
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -13,8 +13,11 @@ def index(request):
         return redirect('login')
 
     fotografias = Fotografia.objects.order_by('data_fotografia').filter(publicado=True)
+    
+    liked = checar_likes(request)
+      
 
-    return render(request, 'galeria/index.html', {'cards': fotografias})
+    return render(request, 'galeria/index.html', {'cards':fotografias,'likes':liked})
 
 def imagem(request, foto_id):
     fotografia = get_object_or_404(Fotografia, pk=foto_id)
@@ -30,22 +33,25 @@ def buscar(request):
         return redirect('login')
 
     fotografias = Fotografia.objects.order_by('data_fotografia').filter(publicado=True)
+    liked = checar_likes(request)
 
     if 'buscar' in request.GET:
         nome_a_buscar = request.GET['buscar']
         if nome_a_buscar:
             fotografias = fotografias.filter(nome__icontains=nome_a_buscar)
 
-    return render(request, 'galeria/buscar.html', {'cards': fotografias})
+    return render(request, 'galeria/buscar.html', {'cards': fotografias, 'likes':liked})
 
 def buscar_tag(request):
     fotografias = Fotografia.objects.order_by('data_fotografia').filter(publicado=True)
+    
+    liked = checar_likes(request)
 
     nome_a_buscar = request.GET['informacao']
 
     fotografias = fotografias.filter(categoria=nome_a_buscar)
 
-    return render(request, 'galeria/buscar.html', {'cards': fotografias})
+    return render(request, 'galeria/buscar.html', {'cards': fotografias, 'likes':liked})
 
 def surpreender(request):
     fotografias = Fotografia.objects.order_by('data_fotografia').filter(publicado=True)
@@ -70,21 +76,24 @@ def surpreender(request):
 
 def novas(request):
     fotografias = Fotografia.objects.order_by("-data_fotografia").filter(publicado=True)[:4]
-    return render(request, 'galeria/novas.html', {'cards':fotografias})
+    liked = checar_likes(request)
+    return render(request, 'galeria/novas.html', {'cards':fotografias, 'likes':liked})
 
 def mais_vistas(request):
+    liked = checar_likes(request)
     fotografias = Fotografia.objects.order_by('-clique').filter(publicado=True)[:4]
-    return render(request, 'galeria/mais_vistas.html', {'cards':fotografias})
+    return render(request, 'galeria/mais_vistas.html', {'cards':fotografias, 'likes':liked})
 
 def minhas_imagens(request):
     usuario_logado = request.user.id
     fotografias = Fotografia.objects.order_by('data_fotografia').filter(publicado=True, usuario=usuario_logado)
+    liked = checar_likes(request)
 
     if not fotografias:
         messages.error(request, f'{request.user.username} não tem fotográfias no momento')
         return redirect('index')
 
-    return render(request, 'galeria/minhas_imagens.html', {'cards':fotografias})
+    return render(request, 'galeria/minhas_imagens.html', {'cards':fotografias, 'likes':liked})
 
 def por_usuario(request):
     form = PorUsuarioForms()
@@ -94,7 +103,8 @@ def por_usuario(request):
         if form.is_valid():
             nome = form['usuario'].value()
             fotografia = Fotografia.objects.order_by('data_fotografia').filter(publicado=True, usuario=nome)
-            return render(request, 'galeria/index.html', {'cards':fotografia})
+            liked = checar_likes(request)
+            return render(request, 'galeria/index.html', {'cards':fotografia, 'likes':liked})
 
     return render(request, 'galeria/por_usuario.html', {'form':form})
 
@@ -132,3 +142,34 @@ def deletar_imagem(request, foto_id):
     messages.success(request, 'Fotografia Apagada com sucesso')
     return redirect('index')
 
+def conta_likes(request, foto_id):
+    like_existe = False
+    likes = Likes.objects.all()
+
+    for like in likes:
+        if like.fotografia.id == foto_id and like.usuario.id == request.user.id:
+            like.delete()
+            like_existe = True
+            messages.success(request, 'curtida removida com sucesso')
+    
+    if not like_existe:
+        like = Likes(fotografia_id=foto_id, usuario_id=request.user.id)
+        like.save()
+        messages.success(request, 'Fotografia curtida com sucesso')
+
+    fotografias = Fotografia.objects.order_by('data_fotografia').filter(publicado=True)
+    
+    liked = checar_likes(request)
+      
+    return render(request, 'galeria/index.html', {'cards':fotografias, 'likes':liked})
+
+def checar_likes(request):
+    fotografias = Fotografia.objects.order_by('data_fotografia').filter(publicado=True)
+    liked = []
+
+    for foto in fotografias:
+        like = Likes.objects.filter(usuario=request.user.id, fotografia=foto.id)
+        if like:
+            liked.append(foto.nome)
+
+    return liked

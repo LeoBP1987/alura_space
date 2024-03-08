@@ -36,7 +36,11 @@
                                     <div class="card__texto">
                                         <p class="card__descricao">{{fotografia.legenda}}</p>
                                         <span>
-                                            <img src="{% static 'assets/ícones/1x/favorite_outline.png' %}" alt="ícone de coração">
+                                            {% if fotografia.nome in likes  %}
+                                                <a href="{% url 'conta_likes' fotografia.id %}" id="ContaLike"><img src="{% static 'assets/ícones/1x/favorite_true.png' %}" alt="ícone de coração"></a>
+                                            {% else %}  
+                                                <a href="{% url 'conta_likes' fotografia.id %}" id="ContaLike"><img src="{% static 'assets/ícones/1x/favorite_false.png' %}" alt="ícone de coração"></a>
+                                            {% endif %}    
                                         </span>
                                     </div>
                                 </div>
