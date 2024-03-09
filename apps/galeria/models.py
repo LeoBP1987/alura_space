@@ -26,23 +26,10 @@ class Fotografia(models.Model):
         blank=False,
         related_name='user'
     )
+    likes = models.ManyToManyField(
+        to=User,
+        related_name='like'
+    )
 
     def __str__(self):
         return self.nome
-
-class Likes(models.Model):
-    fotografia = models.ForeignKey(
-        to=Fotografia,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=False,
-        related_name='fotografia'            
-        )
-    usuario = models.ForeignKey(
-        to=User,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=False,
-        related_name='user_like'
-        )
-    

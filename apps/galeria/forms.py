@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 class FotografiaForms(forms.ModelForm):
     class Meta():
         model = Fotografia
-        exclude = ['publicado', 'clique', 'usuario', 'data_fotografia']
+        exclude = ['publicado', 'clique', 'usuario', 'data_fotografia', 'likes']
         label = {
             'descricao':'Descrição',
             'data_fotografia': 'Data do registro',

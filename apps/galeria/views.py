@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from apps.galeria.models import Fotografia, Likes
+from apps.galeria.models import Fotografia
 from apps.galeria.forms import FotografiaForms, PorUsuarioForms
 from django.contrib.auth.models import User
 from django.contrib import messages
@@ -108,6 +108,12 @@ def por_usuario(request):
 
     return render(request, 'galeria/por_usuario.html', {'form':form})
 
+def mais_curtidas(request):
+    liked = checar_likes(request)
+    fotografias = Fotografia.objects.order_by('-likes').filter(publicado=True)[:4]
+
+    return render(request, 'galeria/mais_curtidas.html', {'cards':fotografias, 'likes':liked})
+
 def nova_imagem(request):
     form = FotografiaForms()
 
@@ -144,21 +150,19 @@ def deletar_imagem(request, foto_id):
 
 def conta_likes(request, foto_id):
     like_existe = False
-    likes = Likes.objects.all()
+    fotografia = Fotografia.objects.get(id=foto_id)
+    usuario = User.objects.get(username=request.user.username)
 
-    for like in likes:
-        if like.fotografia.id == foto_id and like.usuario.id == request.user.id:
-            like.delete()
-            like_existe = True
-            messages.success(request, 'curtida removida com sucesso')
-    
+    if usuario in fotografia.likes.all():
+        fotografia.likes.remove(usuario)
+        like_existe = True
+        messages.success(request, 'Like Removido com sucesso')
+
     if not like_existe:
-        like = Likes(fotografia_id=foto_id, usuario_id=request.user.id)
-        like.save()
-        messages.success(request, 'Fotografia curtida com sucesso')
+        fotografia = Fotografia.objects.get(id=foto_id)
+        fotografia.likes.add(usuario)
 
-    fotografias = Fotografia.objects.order_by('data_fotografia').filter(publicado=True)
-    
+    fotografias = Fotografia.objects.order_by('data_fotografia').filter(publicado=True)    
     liked = checar_likes(request)
       
     return render(request, 'galeria/index.html', {'cards':fotografias, 'likes':liked})
@@ -168,8 +172,7 @@ def checar_likes(request):
     liked = []
 
     for foto in fotografias:
-        like = Likes.objects.filter(usuario=request.user.id, fotografia=foto.id)
-        if like:
+        if User.objects.get(username=request.user.username) in foto.likes.all():
             liked.append(foto.nome)
 
     return liked
