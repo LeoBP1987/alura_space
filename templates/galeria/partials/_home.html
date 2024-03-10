@@ -41,7 +41,11 @@
                                             {% else %}  
                                                 <a href="{% url 'conta_likes' fotografia.id %}" id="ContaLike"><img src="{% static 'assets/ícones/1x/favorite_false.png' %}" alt="ícone de coração"></a>
                                             {% endif %}
-                                            <a href="http://www.pudim.com.br" id="ContaLike"><img src="{% static 'assets/ícones/1x/marca_paginas.png' %}" alt="ícone de salvar"></a>    
+                                            {% if fotografia.nome in salvas %}
+                                                <a href="{% url 'salvar' fotografia.id %}" id="Salvar"><img src="{% static 'assets/ícones/1x/marca_paginas_true.png' %}" alt="ícone de salvar"></a>
+                                            {% else %}
+                                                <a href="{% url 'salvar' fotografia.id %}" id="Salvar"><img src="{% static 'assets/ícones/1x/marca_paginas_false.png' %}" alt="ícone de salvar"></a>
+                                            {% endif %}
                                         </span>
                                     </div>
                                 </div>
